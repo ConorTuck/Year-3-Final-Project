@@ -1,3 +1,10 @@
+/*objectives:
+    1. create react interface
+    2. create proxy on react to express server
+    3. create the chart
+    4. create the fancy stuff
+*/
+
 const MongoClient = require("mongodb").MongoClient;
 const uri = "mongodb+srv://sentiment:y4tKnECuRyhOI9Ml@cluster0.ogd7h.mongodb.net/test";
 
