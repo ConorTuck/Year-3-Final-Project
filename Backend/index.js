@@ -3,27 +3,16 @@ var express = require('express');
 var session = require ('express-session');
 var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
-var natural = require('natural');
-var Twitter = require('twitter');
-require('dotenv/config');
+
+require('dotenv/config')
+//allows axios to fetch data without cors security feature stoping it
+var cors = require('cors');
 
 var uri = "mongodb+srv://sentiment:y4tKnECuRyhOI9Ml@cluster0.ogd7h.mongodb.net/test";
 const app = express();
 const port = 8000;
 
-const apiKey = process.env.apiKey;
-const apiSecretKey = process.env.apiSecretKey;
-const accessToken = process.env.accessToken;
-const accessTokenSecret = process.env.accessTokenSecret;
-const bearerToken = process.env.bearerToken;
-
-var twitterClient = new Twitter({
-    consumer_key: apiKey,
-    consumer_secret: apiSecretKey,
-    access_token_key: accessToken,
-    access_token_secret: accessTokenSecret
-});
-
+//connect to the database
 MongoClient.connect(uri, async function(err, dbClient) {
     if (err) throw err;
 
@@ -31,6 +20,9 @@ MongoClient.connect(uri, async function(err, dbClient) {
     console.log("Database conected!");
 });
 
+app.use(cors());
+
+//session data.
 app.use(session({
 
     secret: 'somerandomstuffs',
@@ -48,4 +40,4 @@ require('./routes/main')(app,port);
 
 app.set('views',__dirname + '/views');
 
-app.listen(port, () => console.log('app listening on port ${port}!'));
+app.listen(port, () => console.log(`app listening on port ${port}!`));

@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "axios": "^0.26.1",
+    "dotenv": "^16.0.0",
+    "mongodb": "^4.5.0",
+    "natural": "^5.1.13",
+    "twitter": "^1.7.1"
+  }
+}

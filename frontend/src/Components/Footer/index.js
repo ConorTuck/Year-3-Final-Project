@@ -1,12 +1,17 @@
 import React from 'react';
-import { FooterContainer } from './FooterElements';
+import { FooterContainer,DeveloperWrapper,DeveloperName, CopyrightWrapper, Copyright } from './FooterElements';
 
-const Footer1 = () => {
+const Footer = () => {
   return (
     <FooterContainer>
-
+      <DeveloperWrapper>
+        <DeveloperName>Developed By Conor</DeveloperName>
+      </DeveloperWrapper>
+      <CopyrightWrapper>
+        <Copyright>Copyright © {new Date().getFullYear()}</Copyright>
+      </CopyrightWrapper>
     </FooterContainer>
   );
 };
 
-export default Footer1;
+export default Footer;

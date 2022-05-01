@@ -1,12 +1,31 @@
 import styled from "styled-components";
 
-export const FooterContainer = styled.div`
+export const FooterContainer = styled.footer`
     background-color: rgb(33,33,33);
-    padding: 48px 24px;
+    height: 119px;
     display: flex;
     flex-direction: column;
-    justfiy-content: center;
-    align-items: center;
-    max-width: 1100px;
-    margin: 0 auto;
+    align-content: center;
+    justify-content: center;
 `;
+
+export const DeveloperWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+`
+
+export const DeveloperName = styled.h3`  
+    color: white;
+    opacity: 0.9;
+`
+
+export const CopyrightWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+`
+
+export const Copyright = styled.small`
+    color: white;
+    opacity: 0.8;
+    
+`
