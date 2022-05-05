@@ -11,6 +11,7 @@ module.exports = function(app)
          var db = dbClient.db('eosio_data');
          try{
            var tempArray = [];
+           //collect data in batches/pagination
            for(var i = 0; i <= Math.ceil(await db.collection('sentiment').countDocuments({}) / 20); i++){
               await db.collection('sentiment').find({}, {"limit":20, "skip":20*i}).toArray((findErr, results) =>{
               if (findErr) throw findErr;

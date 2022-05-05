@@ -26,7 +26,7 @@ const BSV = () => {
             sentimentDate = new Date(data[j][i].date)
             sentimentDate.setHours(data[j][i].hour)
 
-            sentimentData.push({date: sentimentDate, score: (sentimentScore * 10)+10})
+            sentimentData.push({date: sentimentDate, score: sentimentScore+6})
           }
         }
         setSentimentData(sentimentData)
@@ -65,7 +65,6 @@ const BSV = () => {
         price={priceData}
         assetName={"Bitcoin SV"}
          />
-         <Navbar/>
         <Footer/>
         </>
     )

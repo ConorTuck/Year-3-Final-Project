@@ -3,12 +3,12 @@ import { FooterContainer,DeveloperWrapper,DeveloperName, CopyrightWrapper, Copyr
 
 const Footer = () => {
   return (
-    <FooterContainer>
-      <DeveloperWrapper>
-        <DeveloperName>Developed By Conor</DeveloperName>
-      </DeveloperWrapper>
-      <CopyrightWrapper>
-        <Copyright>Copyright © {new Date().getFullYear()}</Copyright>
+    <FooterContainer data-testid='Footer-1'>
+      <DeveloperWrapper data-testid='Footer-2'>
+        <DeveloperName data-testid='Footer-3'>Developed By Conor</DeveloperName>
+      </DeveloperWrapper >
+      <CopyrightWrapper data-testid='Footer-4'>
+        <Copyright data-testid='Footer-5'>Copyright © {new Date().getFullYear()}</Copyright>
       </CopyrightWrapper>
     </FooterContainer>
   );

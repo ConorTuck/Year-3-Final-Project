@@ -17,8 +17,5 @@
   },
   "scripts": {
     "start": "node index"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.17.10"
   }
 }

@@ -47,11 +47,9 @@ const GraphSVG = ({sentimentData,price,assetName}) => {
     var tempDailySentArray = [];
     var tempPriceArray = [];
     var tempDailyPriceArray = [];
-    var tempSent = 0;
     
     for(var i = 0; i < hourPrice.length; i++){
       if(i < hourSentiment.length){
-        tempSent += hourSentiment[i].score
         if(hourSentiment[i].date.getHours() % 4 === 0){
           tempSentArray.push(hourSentiment[i])
         }
@@ -188,39 +186,38 @@ const GraphSVG = ({sentimentData,price,assetName}) => {
     if(crosshairToggle){
       graph.on("mousemove", mouseMoveCrosshair);
     }
+    //scales 
     const xScale = d3.scaleTime()
     .domain(d3.extent(data, function(i) { return i.date; }))
     .range([0,graphWidth]);
-    
-    if (zoomState){
-      const updateXScale = zoomState.rescaleX(xScale)
-      xScale.domain(updateXScale.domain())
-    }
 
-      const yScale = d3.scaleLinear()
-      .domain(d3.extent(data, function(i) { return i.score; }))
-      .range([graphHeight,0]);
-    
-      const yLogScale = d3.scaleLog()
-      .domain(d3.extent(data, function(i) { return i.score; }))
-      .range([graphHeight,0]);
-    
+    const yScale = d3.scaleLinear()
+    .domain(d3.extent(data, function(i) { return i.score; }))
+    .range([graphHeight,0]);
+  
     const xScalePrice = d3.scaleTime()
     .domain(d3.extent(priceData, function(i) { return i[0]}))
       .range([0,graphWidth]);
-
-      if (zoomState ){
-        const updateXScalePrice = zoomState.rescaleX(xScalePrice)
-        xScalePrice.domain(updateXScalePrice.domain())
-      }
 
     const yScalePrice = d3.scaleLinear()
     .domain(d3.extent(priceData, function(i) { return i[2] }))
     .range([graphHeight,0]);
 
+    const yLogScale = d3.scaleLog()
+    .domain(d3.extent(data, function(i) { return i.score; }))
+    .range([graphHeight,0]);
+
     const yLogScalePrice = d3.scaleLog()
     .domain(d3.extent(priceData, function(i) { return i[2] }))
     .range([graphHeight,0]);
+
+    if (zoomState ){
+      const updateXScalePrice = zoomState.rescaleX(xScalePrice)
+      xScalePrice.domain(updateXScalePrice.domain())
+      
+      const updateXScale = zoomState.rescaleX(xScale)
+      xScale.domain(updateXScale.domain())
+    }
 
     //creates the line path from the data
     const scaleLine = d3.line()
@@ -292,19 +289,16 @@ const GraphSVG = ({sentimentData,price,assetName}) => {
     .attr("y", 0)
 
     //multi date and time formating for xaxis
-    const formatMillisecond = d3.timeFormat(".%L"),
-    formatSecond = d3.timeFormat(":%S"),
-    formatMinute = d3.timeFormat("%I:%M"),
-    formatHour = d3.timeFormat("%I %p"),
-    formatDay = d3.timeFormat("%a %d"),
-    formatWeek = d3.timeFormat("%b %d"),
-    formatMonth = d3.timeFormat("%B"),
-    formatYear = d3.timeFormat("%Y");
+    const formatMinute = d3.timeFormat("%I:%M")
+    const formatHour = d3.timeFormat("%I %p")
+    const formatDay = d3.timeFormat("%a %d")
+    const formatWeek = d3.timeFormat("%b %d")
+    const formatMonth = d3.timeFormat("%B")
+    const formatYear = d3.timeFormat("%Y")
 
+    //return appropriate format.
     function multiFormat(date) {
-      return (d3.timeSecond(date) < date ? formatMillisecond
-          : d3.timeMinute(date) < date ? formatSecond
-          : d3.timeHour(date) < date ? formatMinute
+      return (d3.timeHour(date) < date ? formatMinute
           : d3.timeDay(date) < date ? formatHour
           : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
           : d3.timeYear(date) < date ? formatMonth
@@ -346,7 +340,7 @@ const GraphSVG = ({sentimentData,price,assetName}) => {
     //sent title
     graph.append("text")
     .attr("text-anchor", "end")
-    .attr("transform", "rotate(-90)")
+    .attr("transform", "rotate(-90)") 
     .attr("x", -graphHeight/2.5)
     .attr("y", 0 - 50)
     .text("SENTIMENT SCORE")
@@ -527,7 +521,9 @@ const GraphSVG = ({sentimentData,price,assetName}) => {
       .attr('stroke-width',currentThickness)
       .attr('stroke', `${currentLine.lineColor}`);
     }
-
+  
+    //trendline rendering
+    try {
     for(var i = 0; i < trendlines.length; i++){
       graphClip.append('line')
       .style("stroke", `${trendlines[i].lineColor}`)
@@ -538,7 +534,6 @@ const GraphSVG = ({sentimentData,price,assetName}) => {
       .attr("y2", trendlines[i].points[trendlines[i].points.length-1].y);
     }
 
-    //console.log(currentLine.points[0])
     if(currentLine.points.length !== 0 && trendlineToggle){
       graphClip.append('line')
       .style("stroke", `${currentLine.lineColor}`)
@@ -547,6 +542,10 @@ const GraphSVG = ({sentimentData,price,assetName}) => {
       .attr("y1", currentLine.points[0].y)
       .attr("x2", currentLine.points[currentLine.points.length-1].x)
       .attr("y2", currentLine.points[currentLine.points.length-1].y);
+    }
+    } catch (error) {
+    console.log("trendline error")
+    addTrendlines((trendlines)=> trendlines.filter((_, i) => i !== trendlines.length-1))
     }
 
     //fib retracement
@@ -666,73 +665,73 @@ const GraphSVG = ({sentimentData,price,assetName}) => {
 
   return (
     <>
-      <GraphToolBar>
-        <TimerangeContainer>
-          <ButtonTitle onClick={() =>setTimeRangeToggle(!timeRangeToggle)}>TimeScale</ButtonTitle>
+      <GraphToolBar data-testid='Graph-1'>
+        <TimerangeContainer data-testid='Graph-2'>
+          <ButtonTitle data-testid='Graph-3' onClick={() =>setTimeRangeToggle(!timeRangeToggle)}>TimeScale</ButtonTitle>
           {timeRangeToggle &&
-          <TimerangeDropDown>
-            <TimerangeWrapper>
-              <TimerangeOptions onClick={() =>{setTimeRangeToggle(!timeRangeToggle); setData(hourSentiment); setPriceData(hourPrice); removeAllLines()}}>1H</TimerangeOptions>
+          <TimerangeDropDown data-testid='Graph-4'>
+            <TimerangeWrapper data-testid='Graph-5'>
+              <TimerangeOptions data-testid='Graph-6' onClick={() =>{setTimeRangeToggle(!timeRangeToggle); setData(hourSentiment); setPriceData(hourPrice); removeAllLines()}}>1H</TimerangeOptions>
             </TimerangeWrapper>
-            <TimerangeWrapper>
-              <TimerangeOptions onClick={() =>{setTimeRangeToggle(!timeRangeToggle); setData(fourHourSentiment); setPriceData(fourHourPrice); removeAllLines()}}>4H</TimerangeOptions>
+            <TimerangeWrapper data-testid='Graph-7'>
+              <TimerangeOptions data-testid='Graph-8' onClick={() =>{setTimeRangeToggle(!timeRangeToggle); setData(fourHourSentiment); setPriceData(fourHourPrice); removeAllLines()}}>4H</TimerangeOptions>
             </TimerangeWrapper>
-            <TimerangeWrapper>
-              <TimerangeOptions onClick={() =>{setTimeRangeToggle(!timeRangeToggle); setData(dailySentiment); setPriceData(dailyPrice); removeAllLines()}}>1D</TimerangeOptions>
+            <TimerangeWrapper data-testid='Graph-9'>
+              <TimerangeOptions data-testid='Graph-10' onClick={() =>{setTimeRangeToggle(!timeRangeToggle); setData(dailySentiment); setPriceData(dailyPrice); removeAllLines()}}>1D</TimerangeOptions>
             </TimerangeWrapper>
           </TimerangeDropDown>
           }
         </TimerangeContainer>
-        <LogScaleWrapper>
-        <ColorButtonTitle onClick={() =>setLogToggle(!logToggle)} toggle={logToggle}>Log Scale</ColorButtonTitle>
+        <LogScaleWrapper data-testid='Graph-11'>
+        <ColorButtonTitle  data-testid='Graph-12' onClick={() =>setLogToggle(!logToggle)} toggle={logToggle}>Log Scale</ColorButtonTitle>
         </LogScaleWrapper>
-        <TrendlineWrapper>
-        <ColorButtonTitle onClick={() =>{setTrendlineToggle(!trendlineToggle); setDrawToggle(false); setCrosshairToggle(false); setFibRetracementToggle(false)}} toggle={trendlineToggle}>TrendLine</ColorButtonTitle>
+        <TrendlineWrapper data-testid='Graph-13'>
+        <ColorButtonTitle data-testid='Graph-14' onClick={() =>{setTrendlineToggle(!trendlineToggle); setDrawToggle(false); setCrosshairToggle(false); setFibRetracementToggle(false)}} toggle={trendlineToggle}>TrendLine</ColorButtonTitle>
         {trendlineToggle && 
-          <DrawDropDown>
-            <ColorOptionContainer>
-              <ColorOptionWrapper>
-              <ColorPicker type={"Color"} value={lineColor} onChange={(e)=> setLineColor(e.target.value)}></ColorPicker>
+          <DrawDropDown data-testid='Graph-16'>
+            <ColorOptionContainer data-testid='Graph-17'>
+              <ColorOptionWrapper data-testid='Graph-18'>
+              <ColorPicker data-testid='Graph-19' type={"Color"} value={lineColor} onChange={(e)=> setLineColor(e.target.value)}></ColorPicker>
               </ColorOptionWrapper>
-              <UndoButton onClick={() => {addTrendlines((trendlines)=> trendlines.filter((_, i) => i !== trendlines.length-1)); setCurrentLine({ thickness,lineColor, points:[]})}} width={50}>⭯</UndoButton>
+              <UndoButton  data-testid='Graph-20'onClick={() => {addTrendlines((trendlines)=> trendlines.filter((_, i) => i !== trendlines.length-1)); setCurrentLine({ thickness,lineColor, points:[]})}} width={50}>⭯</UndoButton>
             </ColorOptionContainer>
-            <Slider type={'range'} value={thickness} min={1} max={20} onChange={(e)=> setThickness(e.target.value)}/>
+            <Slider data-testid='Graph-21' type={'range'} value={thickness} min={1} max={20} onChange={(e)=> setThickness(e.target.value)}/>
           </DrawDropDown>
         }
-        </TrendlineWrapper>
-        <CrosshairWrapper>
-        <ColorButtonTitle onClick={() =>{setCrosshairToggle(!crosshairToggle); setTrendlineToggle(false); setDrawToggle(false); setFibRetracementToggle(false)}} toggle={crosshairToggle}>Crosshair</ColorButtonTitle>
+        </TrendlineWrapper >
+        <CrosshairWrapper data-testid='Graph-22'>
+        <ColorButtonTitle  data-testid='Graph-23' onClick={() =>{setCrosshairToggle(!crosshairToggle); setTrendlineToggle(false); setDrawToggle(false); setFibRetracementToggle(false)}} toggle={crosshairToggle}>Crosshair</ColorButtonTitle>
         </CrosshairWrapper>
-        <PriceWrapper>
-        <ColorButtonTitle onClick={() =>setPriceToggle(!priceToggle)} toggle={priceToggle}>Price</ColorButtonTitle>
+        <PriceWrapper data-testid='Graph-24'>
+        <ColorButtonTitle data-testid='Graph-25' onClick={() =>setPriceToggle(!priceToggle)} toggle={priceToggle}>Price</ColorButtonTitle>
         </PriceWrapper>
-        <DrawContainer>
-        <ColorButtonTitle onClick={() =>{setDrawToggle(!drawToggle); setTrendlineToggle(false); setCrosshairToggle(false); setFibRetracementToggle(false)}} toggle={drawToggle}>Draw</ColorButtonTitle>
+        <DrawContainer data-testid='Graph-26'>
+        <ColorButtonTitle data-testid='Graph-27' onClick={() =>{setDrawToggle(!drawToggle); setTrendlineToggle(false); setCrosshairToggle(false); setFibRetracementToggle(false)}} toggle={drawToggle}>Draw</ColorButtonTitle>
         {drawToggle && 
-          <DrawDropDown>
-            <ColorOptionContainer>
-              <ColorOptionWrapper>
-                <ColorPicker type={"Color"} value={lineColor} onChange={(e)=> setLineColor(e.target.value)}></ColorPicker>
-              </ColorOptionWrapper>
-              <UndoButton onClick={() => {addLines((lines)=> lines.filter((_, i) => i !== lines.length-1)); setCurrentLine({ thickness,lineColor, points:[]})}} width={50}>⭯</UndoButton>
+          <DrawDropDown data-testid='Graph-28'>
+            <ColorOptionContainer data-testid='Graph-29'>
+              <ColorOptionWrapper data-testid='Graph-30'>
+                <ColorPicker data-testid='Graph-31' type={"Color"} value={lineColor} onChange={(e)=> setLineColor(e.target.value)}></ColorPicker>
+              </ColorOptionWrapper >
+              <UndoButton  data-testid='Graph-32' onClick={() => {addLines((lines)=> lines.filter((_, i) => i !== lines.length-1)); setCurrentLine({ thickness,lineColor, points:[]})}} width={50}>⭯</UndoButton>
             </ColorOptionContainer>
-            <Slider type={'range'} value={thickness} min={1} max={20} onChange={(e)=> setThickness(e.target.value)}/>
+            <Slider  data-testid='Graph-33' type={'range'} value={thickness} min={1} max={20} onChange={(e)=> setThickness(e.target.value)}/>
           </DrawDropDown>
         }
         </DrawContainer>
-        <FibRetraceWrapper>
-          <ColorButtonTitle onClick={() =>{setFibRetracementToggle(!fibRetracementToggle); setCrosshairToggle(false); setDrawToggle(false); setTrendlineToggle(false)}} toggle={fibRetracementToggle}>Fib Retracement</ColorButtonTitle>
+        <FibRetraceWrapper data-testid='Graph-34'>
+          <ColorButtonTitle  data-testid='Graph-35'onClick={() =>{setFibRetracementToggle(!fibRetracementToggle); setCrosshairToggle(false); setDrawToggle(false); setTrendlineToggle(false)}} toggle={fibRetracementToggle}>Fib Retracement</ColorButtonTitle>
           {fibRetracementToggle && 
-            <FibDropDown>
-              <FibUndoWrapper>
-                <UndoButton onClick={() => { addFibRetracements((fibRetracements)=> fibRetracements.filter((_, i) => i !== fibRetracements.length-1)); setCurrentLine({ thickness,lineColor, points:[]})}} width={100}>Undo</UndoButton>
+            <FibDropDown data-testid='Graph-36'>
+              <FibUndoWrapper data-testid='Graph-37'>
+                <UndoButton data-testid='Graph-38' onClick={() => { addFibRetracements((fibRetracements)=> fibRetracements.filter((_, i) => i !== fibRetracements.length-1)); setCurrentLine({ thickness,lineColor, points:[]})}} width={100}>Undo</UndoButton>
               </FibUndoWrapper>
             </FibDropDown>
           }
         </FibRetraceWrapper>
       </GraphToolBar>
-      <GraphContainer ref={containerRef}>
-        <Graph onMouseDown={enableDrawing} onMouseUp={disableDrawing} onMouseEnter={allowHover} onMouseLeave={denyHover} ref={graphRef}/>
+      <GraphContainer data-testid='Graph-39' ref={containerRef}>
+        <Graph  data-testid='Graph-40' onMouseDown={enableDrawing} onMouseUp={disableDrawing} onMouseEnter={allowHover} onMouseLeave={denyHover} ref={graphRef}/>
       </GraphContainer>
     </>
   );
